@@ -1,0 +1,141 @@
+/**
+ * Prim's Minimum Spanning Tree algorithm.
+ *
+ * Usa un implementación de heap mínimo para mantener las aristas candidatas ordenadas por peso.
+ *
+ * Depends on: Edge, MinHeap, ArrayList, HashMap, HashSet (all in src/).
+ *
+ * Complexity (lazy variant):
+ *   Time  — O(E log E)
+ *   Space — O(V + E)
+ *
+ *
+ */
+public class Prim {
+ 
+    // Adjacency list: node -> list of edges leaving that node
+    private final HashMap<Integer, ArrayList<Edge>> graph;
+ 
+    // -------------------------------------------------------------------------
+    // Constructor
+    // -------------------------------------------------------------------------
+ 
+    public Prim() {
+        graph = new HashMap<>();
+    }
+ 
+    // -------------------------------------------------------------------------
+    // Graph construction
+    // -------------------------------------------------------------------------
+ 
+    /**
+     * Adds an undirected weighted edge between {@code from} and {@code to}.
+     * Both directions are stored so the graph can be traversed from either end.
+     *
+     * @param from   source node id
+     * @param to     destination node id
+     * @param weight edge weight (must be non-negative for MST to be meaningful)
+     */
+    public void addEdge(int from, int to, double weight) {
+        addDirected(from, to, weight);
+        addDirected(to, from, weight);
+    }
+ 
+    // -------------------------------------------------------------------------
+    // Algorithm
+    // -------------------------------------------------------------------------
+ 
+    /**
+     * Runs Prim's algorithm starting from {@code startNode} and returns the
+     * edges that form the Minimum Spanning Tree.
+     *
+     * If the graph is disconnected, only the component reachable from
+     * {@code startNode} is spanned. Check {@code mst.size() == V - 1} to
+     * verify full connectivity.
+     *
+     * @param startNode any node id present in the graph
+     * @return list of edges in the MST, ordered by the sequence they were added
+     * @throws IllegalArgumentException if startNode is not in the graph
+     */
+    public ArrayList<Edge> buildMST(int startNode) {
+        if (!graph.containsKey(startNode))
+            throw new IllegalArgumentException("Start node not found in graph: " + startNode);
+ 
+        ArrayList<Edge> mst     = new ArrayList<>();
+        HashSet<Integer> inMST  = new HashSet<>();
+        MinHeap heap            = new MinHeap();
+ 
+        // Seed: mark start node as visited and push all its edges
+        visit(startNode, inMST, heap);
+ 
+        while (!heap.isEmpty()) {
+            Edge cheapest = heap.extractMin();
+ 
+            // Lazy check: skip if the destination is already part of the MST
+            if (inMST.contains(cheapest.to))
+                continue;
+ 
+            // Accept this edge and expand from the new node
+            mst.add(cheapest);
+            visit(cheapest.to, inMST, heap);
+        }
+ 
+        return mst;
+    }
+ 
+    // -------------------------------------------------------------------------
+    // Result utilities
+    // -------------------------------------------------------------------------
+ 
+    /**
+     * Returns the total weight of a list of edges (e.g. the result of buildMST).
+     *
+     * @param edges any ArrayList of Edge objects
+     * @return sum of edge weights
+     */
+    public static double totalWeight(ArrayList<Edge> edges) {
+        double total = 0;
+        for (int i = 0; i < edges.size(); i++)
+            total += edges.get(i).weight;
+        return total;
+    }
+ 
+    /**
+     * Prints each edge in the list along with the running total weight.
+     * Useful for quick debugging or lab reports.
+     *
+     * @param edges list to display (typically the MST result)
+     */
+    public static void printMST(ArrayList<Edge> edges) {
+        System.out.println("MST edges (" + edges.size() + " total):");
+        for (int i = 0; i < edges.size(); i++)
+            System.out.println("  " + edges.get(i));
+        System.out.println("Total weight: " + totalWeight(edges));
+    }
+ 
+    // -------------------------------------------------------------------------
+    // Internal helpers
+    // -------------------------------------------------------------------------
+ 
+    /**
+     * Marks {@code node} as part of the MST and enqueues all its edges
+     * that lead to nodes not yet in the MST.
+     */
+    private void visit(int node, HashSet<Integer> inMST, MinHeap heap) {
+        inMST.add(node);
+        ArrayList<Edge> neighbors = graph.get(node);
+        if (neighbors == null) return;
+ 
+        for (int i = 0; i < neighbors.size(); i++) {
+            Edge edge = neighbors.get(i);
+            if (!inMST.contains(edge.to))
+                heap.insert(edge);
+        }
+    }
+ 
+    /** Adds a single directed edge to the adjacency list. */
+    private void addDirected(int from, int to, double weight) {
+        if (!graph.containsKey(from))
+            graph.put(from, new ArrayList<>());
+        graph.get(from).add(new Edge(from, to, weight));
+    }

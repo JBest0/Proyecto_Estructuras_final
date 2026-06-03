@@ -1,0 +1,152 @@
+/**
+ * Min-heap de aristas.
+ *
+ * logica de operacion:
+ *   - El elemento mínimo (la arista de menor peso) siempre está en la raíz (índice 0).
+ *   - Al insertar una nueva arista, se coloca al final del array y luego se "sift up" para restaurar el orden del heap.
+ *   - Al extraer el mínimo, se reemplaza la raíz con el último elemento y luego se "sift down" para restaurar el orden del heap.   
+ * Backed by a plain array that doubles when full.
+ * Supports only the three operations Prim's algorithm needs:
+ *   insert(edge)   — O(log n)
+ *   extractMin()   — O(log n)
+ *   isEmpty()      — O(1)
+ *
+ * Index relationships for a node at position i:
+ *   parent      = (i - 1) / 2
+ *   left child  = 2*i + 1
+ *   right child = 2*i + 2
+ */
+public class MinHeap {
+ 
+    private static final int DEFAULT_CAPACITY = 16;
+ 
+    private Edge[] data;
+    private int size;
+ 
+    // -------------------------------------------------------------------------
+    // Constructor
+    // -------------------------------------------------------------------------
+ 
+    public MinHeap() {
+        data = new Edge[DEFAULT_CAPACITY];
+        size = 0;
+    }
+ 
+    // -------------------------------------------------------------------------
+    // Public API
+    // -------------------------------------------------------------------------
+ 
+    /**
+     * Inserts a new edge into the heap.
+     */
+    public void insert(Edge edge) {
+        ensureCapacity();
+        data[size] = edge;
+        siftUp(size);
+        size++;
+    }
+ 
+    /**
+     * Removes and returns the edge with the smallest weight.
+     *
+     * @throws IllegalStateException if the heap is empty.
+     */
+    public Edge extractMin() {
+        if (isEmpty())
+            throw new IllegalStateException("Heap is empty");
+ 
+        Edge min = data[0];
+ 
+        // Move the last element to the root and restore heap order
+        size--;
+        data[0] = data[size];
+        data[size] = null;  // let GC collect
+        siftDown(0);
+ 
+        return min;
+    }
+ 
+    /**
+     * Returns true if the heap has no elements.
+     */
+    public boolean isEmpty() {
+        return size == 0;
+    }
+ 
+    /**
+     * Returns the number of elements currently in the heap.
+     */
+    public int size() {
+        return size;
+    }
+ 
+    // -------------------------------------------------------------------------
+    // Internal helpers
+    // -------------------------------------------------------------------------
+ 
+    /**
+     * Moves the element at index i upward until the heap property is restored.
+     * Called after inserting a new element at the end.
+     */
+    private void siftUp(int i) {
+        while (i > 0) {
+            int parent = (i - 1) / 2;
+            if (data[i].weight < data[parent].weight) {
+                swap(i, parent);
+                i = parent;
+            } else {
+                break;
+            }
+        }
+    }
+ 
+    /**
+     * Moves the element at index i downward until the heap property is restored.
+     * Called after removing the root and placing the last element there.
+     */
+    private void siftDown(int i) {
+        while (true) {
+            int smallest = i;
+            int left     = 2 * i + 1;
+            int right    = 2 * i + 2;
+ 
+            if (left  < size && data[left].weight  < data[smallest].weight) smallest = left;
+            if (right < size && data[right].weight < data[smallest].weight) smallest = right;
+ 
+            if (smallest == i) break;   // already in the right place
+ 
+            swap(i, smallest);
+            i = smallest;
+        }
+    }
+ 
+    private void swap(int a, int b) {
+        Edge temp = data[a];
+        data[a]   = data[b];
+        data[b]   = temp;
+    }
+ 
+    /** Doubles the backing array if it is full. */
+    private void ensureCapacity() {
+        if (size == data.length) {
+            Edge[] newData = new Edge[data.length * 2];
+            System.arraycopy(data, 0, newData, 0, size);
+            data = newData;
+        }
+    }
+ 
+    // -------------------------------------------------------------------------
+    // Utility
+    // -------------------------------------------------------------------------
+ 
+    @Override
+    public String toString() {
+        if (size == 0) return "[]";
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < size; i++) {
+            sb.append(data[i]);
+            if (i < size - 1) sb.append(", ");
+        }
+        return sb.append("]").toString();
+    }
+}
