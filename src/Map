@@ -1,0 +1,54 @@
+public interface Map<K, V> {
+ 
+    /**
+     * Associates key with value. Overwrites existing value if key already present.
+     * Returns the previous value, or null if none.
+     */
+    V put(K key, V value);
+ 
+    /**
+     * Returns the value mapped to key, or null if not present.
+     */
+    V get(K key);
+ 
+    /**
+     * Removes the mapping for key.
+     * Returns the removed value, or null if absent.
+     */
+    V remove(K key);
+ 
+    /**
+     * Returns true if the map contains a mapping for the given key.
+     */
+    boolean containsKey(K key);
+ 
+    /**
+     * Returns true if any key maps to the given value.
+     */
+    boolean containsValue(V value);
+ 
+    /**
+     * Returns the number of key-value mappings in the map.
+     */
+    int size();
+ 
+    /**
+     * Returns true if the map contains no mappings.
+     */
+    boolean isEmpty();
+ 
+    /**
+     * Removes all mappings from the map.
+     */
+    void clear();
+ 
+    /**
+     * Returns an array of all keys in the map.
+     */
+    Object[] keys();
+ 
+    /**
+     * Returns an array of all values in the map.
+     */
+    Object[] values();
+}

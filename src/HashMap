@@ -1,0 +1,220 @@
+public class HashMap<K, V> {
+ 
+    private static final int    DEFAULT_CAPACITY   = 16;
+    private static final float  DEFAULT_LOAD_FACTOR = 0.75f;
+ 
+    // -------------------------------------------------------------------------
+    // Internal node (separate chaining)
+    // -------------------------------------------------------------------------
+ 
+    private static class Node<K, V> {
+        final K key;
+        V value;
+        Node<K, V> next;
+ 
+        Node(K key, V value, Node<K, V> next) {
+            this.key   = key;
+            this.value = value;
+            this.next  = next;
+        }
+    }
+ 
+    // -------------------------------------------------------------------------
+    // Fields
+    // -------------------------------------------------------------------------
+ 
+    private Node<K, V>[] buckets;
+    private int size;
+    private final float loadFactor;
+ 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+ 
+    @SuppressWarnings("unchecked")
+    public HashMap() {
+        buckets    = new Node[DEFAULT_CAPACITY];
+        loadFactor = DEFAULT_LOAD_FACTOR;
+    }
+ 
+    @SuppressWarnings("unchecked")
+    public HashMap(int initialCapacity, float loadFactor) {
+        if (initialCapacity < 1)
+            throw new IllegalArgumentException("Capacity must be >= 1");
+        if (loadFactor <= 0 || Float.isNaN(loadFactor))
+            throw new IllegalArgumentException("Load factor must be positive");
+        buckets          = new Node[initialCapacity];
+        this.loadFactor  = loadFactor;
+    }
+ 
+    // -------------------------------------------------------------------------
+    // Core operations
+    // -------------------------------------------------------------------------
+ 
+    /**
+     * Associates key with value. Overwrites existing value if key already present.
+     * Returns the previous value, or null if none.
+     */
+    public V put(K key, V value) {
+        int idx  = bucketIndex(key);
+        Node<K, V> head = buckets[idx];
+ 
+        // Walk the chain — update if key already exists
+        for (Node<K, V> n = head; n != null; n = n.next) {
+            if (keysEqual(n.key, key)) {
+                V old = n.value;
+                n.value = value;
+                return old;
+            }
+        }
+ 
+        // Prepend new node
+        buckets[idx] = new Node<>(key, value, head);
+        size++;
+ 
+        if (size > buckets.length * loadFactor)
+            resize();
+ 
+        return null;
+    }
+ 
+    /**
+     * Returns the value mapped to key, or null if not present.
+     */
+    public V get(K key) {
+        Node<K, V> n = findNode(key);
+        return n == null ? null : n.value;
+    }
+ 
+    /**
+     * Removes the mapping for key. Returns the removed value, or null if absent.
+     */
+    public V remove(K key) {
+        int idx  = bucketIndex(key);
+        Node<K, V> prev = null;
+        Node<K, V> curr = buckets[idx];
+ 
+        while (curr != null) {
+            if (keysEqual(curr.key, key)) {
+                if (prev == null)
+                    buckets[idx] = curr.next;
+                else
+                    prev.next = curr.next;
+                size--;
+                return curr.value;
+            }
+            prev = curr;
+            curr = curr.next;
+        }
+        return null;
+    }
+ 
+    /**
+     * Returns true if the map contains a mapping for key.
+     */
+    public boolean containsKey(K key) {
+        return findNode(key) != null;
+    }
+ 
+    /**
+     * Returns true if any key maps to the given value (linear scan of all buckets).
+     */
+    public boolean containsValue(V value) {
+        for (Node<K, V> head : buckets)
+            for (Node<K, V> n = head; n != null; n = n.next)
+                if (value == null ? n.value == null : value.equals(n.value))
+                    return true;
+        return false;
+    }
+ 
+    // -------------------------------------------------------------------------
+    // Query / utility
+    // -------------------------------------------------------------------------
+ 
+    public int size()      { return size; }
+    public boolean isEmpty() { return size == 0; }
+ 
+    /** Removes all mappings. */
+    @SuppressWarnings("unchecked")
+    public void clear() {
+        buckets = new Node[DEFAULT_CAPACITY];
+        size    = 0;
+    }
+ 
+    /**
+     * Returns a simple array of all keys (no Iterator required).
+     */
+    @SuppressWarnings("unchecked")
+    public Object[] keys() {
+        Object[] result = new Object[size];
+        int idx = 0;
+        for (Node<K, V> head : buckets)
+            for (Node<K, V> n = head; n != null; n = n.next)
+                result[idx++] = n.key;
+        return result;
+    }
+ 
+    /**
+     * Returns a simple array of all values.
+     */
+    public Object[] values() {
+        Object[] result = new Object[size];
+        int idx = 0;
+        for (Node<K, V> head : buckets)
+            for (Node<K, V> n = head; n != null; n = n.next)
+                result[idx++] = n.value;
+        return result;
+    }
+ 
+    // -------------------------------------------------------------------------
+    // Internal helpers
+    // -------------------------------------------------------------------------
+ 
+    private Node<K, V> findNode(K key) {
+        for (Node<K, V> n = buckets[bucketIndex(key)]; n != null; n = n.next)
+            if (keysEqual(n.key, key))
+                return n;
+        return null;
+    }
+ 
+    private int bucketIndex(K key) {
+        if (key == null) return 0;
+        // Spread bits to reduce clustering (mirrors Java's own approach)
+        int h = key.hashCode();
+        h ^= (h >>> 16);
+        return Math.abs(h) % buckets.length;
+    }
+ 
+    private boolean keysEqual(K a, K b) {
+        return a == null ? b == null : a.equals(b);
+    }
+ 
+    /** Doubles the bucket array and rehashes all existing entries. */
+    @SuppressWarnings("unchecked")
+    private void resize() {
+        Node<K, V>[] old = buckets;
+        buckets = new Node[old.length * 2];
+        size    = 0;                          // put() will recount
+ 
+        for (Node<K, V> head : old)
+            for (Node<K, V> n = head; n != null; n = n.next)
+                put(n.key, n.value);          // rehash into new array
+    }
+ 
+    // -------------------------------------------------------------------------
+    // toString
+    // -------------------------------------------------------------------------
+ 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("{");
+        boolean first = true;
+        for (Node<K, V> head : buckets) {
+            for (Node<K, V> n = head; n != null; n = n.next) {
+                if (!first) sb.append(", ");
+                sb.append(n.key).append("=").append(n.value);
+                first = false;
+            }
+        }
+        return sb.append("}").toString();
+    }

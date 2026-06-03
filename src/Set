@@ -1,0 +1,44 @@
+/**
+ * 
+ *
+ * @param <E> the type of elements
+ */
+public interface Set<E> {
+ 
+    /**
+     * Adds the element to the set if it is not already present.
+     * Returns true if the set was modified (i.e. element was not already present).
+     */
+    boolean add(E element);
+ 
+    /**
+     * Removes the specified element from the set if present.
+     * Returns true if the element was found and removed.
+     */
+    boolean remove(Object element);
+ 
+    /**
+     * Returns true if the set contains the specified element.
+     */
+    boolean contains(Object element);
+ 
+    /**
+     * Returns the number of elements in the set.
+     */
+    int size();
+ 
+    /**
+     * Returns true if the set contains no elements.
+     */
+    boolean isEmpty();
+ 
+    /**
+     * Removes all elements from the set.
+     */
+    void clear();
+ 
+    /**
+     * Returns an array containing all elements in the set.
+     */
+    Object[] toArray();
+}

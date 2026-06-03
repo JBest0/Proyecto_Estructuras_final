@@ -1,26 +1,27 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import client.data.LinkedList;
 
 public class BFS {
 
-    private Map<Integer, ArrayList<Integer>> graph;
+    private HashMap<Integer, ArrayList<Integer>> graph;
 
     public BFS() {
         this.graph = new HashMap<>();
     }
 
     public void addEdge(int from, int to) {
-        graph.computeIfAbsent(from, k -> new ArrayList<>()).add(to);
-        graph.computeIfAbsent(to,   k -> new ArrayList<>()).add(from);
+        if (!graph.containsKey(from)) {
+            graph.put(from, new ArrayList<>());
+        }
+        graph.get(from).add(to);
+
+        if (!graph.containsKey(to)) {
+            graph.put(to, new ArrayList<>());
+        }
+        graph.get(to).add(from);
     }
 
     public void bfs(int start) {
-        Set<Integer> visited = new HashSet<>();
+        HashSet<Integer> visited = new HashSet<>();
         LinkedList<Integer> queue = new LinkedList<>();
 
         visited.add(start);
@@ -31,10 +32,14 @@ public class BFS {
 
             System.out.println("Visitando nodo: " + node);
 
-            for (int neighbor : graph.getOrDefault(node, new ArrayList<>())) {
-                if (!visited.contains(neighbor)) {
-                    visited.add(neighbor);
-                    queue.add(neighbor);     // enqueue
+            ArrayList<Integer> neighbors = graph.get(node);
+            if (neighbors != null) {
+                for (int i = 0; i < neighbors.size(); i++) {
+                    int neighbor = neighbors.get(i);
+                    if (!visited.contains(neighbor)) {
+                        visited.add(neighbor);
+                        queue.add(neighbor);     // enqueue
+                    }
                 }
             }
         }

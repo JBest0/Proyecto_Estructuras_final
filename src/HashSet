@@ -1,0 +1,99 @@
+/**
+ *
+ * 
+ *
+ * @param <E> the type of elements
+ */
+public class HashSet<E> implements Set<E> {
+ 
+    // Dummy value stored for every key — we only care about key presence.
+    private static final Object PRESENT = new Object();
+ 
+    private final HashMap<E, Object> map;
+ 
+    // -------------------------------------------------------------------------
+    // Constructors
+    // -------------------------------------------------------------------------
+ 
+    public HashSet() {
+        map = new HashMap<>();
+    }
+ 
+    public HashSet(int initialCapacity, float loadFactor) {
+        map = new HashMap<>(initialCapacity, loadFactor);
+    }
+ 
+    // -------------------------------------------------------------------------
+    // Set interface
+    // -------------------------------------------------------------------------
+ 
+    /**
+     * Adds element to the set if not already present.
+     * Returns true if the set changed as a result.
+     */
+    @Override
+    public boolean add(E element) {
+        // put() returns null when there was no previous mapping (new key)
+        return map.put(element, PRESENT) == null;
+    }
+ 
+    /**
+     * Removes the specified element.
+     * Returns true if it was present.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean remove(Object element) {
+        return map.remove((E) element) == PRESENT;
+    }
+ 
+    /**
+     * Returns true if the set contains the element.
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean contains(Object element) {
+        return map.containsKey((E) element);
+    }
+ 
+    @Override
+    public int size() {
+        return map.size();
+    }
+ 
+    @Override
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
+ 
+    /**
+     * Removes all elements from the set.
+     */
+    @Override
+    public void clear() {
+        map.clear();
+    }
+ 
+    /**
+     * Returns an array containing all elements in the set.
+     */
+    @Override
+    public Object[] toArray() {
+        return map.keys();
+    }
+ 
+    // -------------------------------------------------------------------------
+    // toString
+    // -------------------------------------------------------------------------
+ 
+    @Override
+    public String toString() {
+        Object[] elements = toArray();
+        if (elements.length == 0) return "[]";
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < elements.length; i++) {
+            sb.append(elements[i]);
+            if (i < elements.length - 1) sb.append(", ");
+        }
+        return sb.append("]").toString();
+    }
