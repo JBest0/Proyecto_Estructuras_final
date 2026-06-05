@@ -1,43 +1,44 @@
 /**
- * Min-heap de aristas.
+ * Montículo mínimo (min-heap) para almacenar aristas.
  *
- * logica de operacion:
- *   - El elemento mínimo (la arista de menor peso) siempre está en la raíz (índice 0).
- *   - Al insertar una nueva arista, se coloca al final del array y luego se "sift up" para restaurar el orden del heap.
- *   - Al extraer el mínimo, se reemplaza la raíz con el último elemento y luego se "sift down" para restaurar el orden del heap.   
- * Backed by a plain array that doubles when full.
- * Supports only the three operations Prim's algorithm needs:
- *   insert(edge)   — O(log n)
- *   extractMin()   — O(log n)
- *   isEmpty()      — O(1)
+ * <p>La arista de menor peso siempre está en la raíz (índice 0).
+ * Proporciona las tres operaciones que necesita el algoritmo de Prim:
+ * <ul>
+ *   <li>insert(edge) — O(log n)</li>
+ *   <li>extractMin() — O(log n)</li>
+ *   <li>isEmpty() — O(1)</li>
+ * </ul>
+ * </p>
  *
- * Index relationships for a node at position i:
- *   parent      = (i - 1) / 2
- *   left child  = 2*i + 1
- *   right child = 2*i + 2
+ * <p>Usa un arreglo dinámico que se redimensiona automáticamente.</p>
+ *
+ * @author Job Jimenez
+ * @version 1.0
+ * @see Edge
+ * @see Prim
  */
 public class MinHeap {
- 
+
     private static final int DEFAULT_CAPACITY = 16;
- 
+
+    /** Arreglo interno que almacena las aristas. */
     private Edge[] data;
+
+    /** Número actual de aristas en el heap. */
     private int size;
- 
-    // -------------------------------------------------------------------------
-    // Constructor
-    // -------------------------------------------------------------------------
- 
+
+    /**
+     * Construye un heap vacío con capacidad inicial por defecto.
+     */
     public MinHeap() {
         data = new Edge[DEFAULT_CAPACITY];
         size = 0;
     }
- 
-    // -------------------------------------------------------------------------
-    // Public API
-    // -------------------------------------------------------------------------
- 
+
     /**
-     * Inserts a new edge into the heap.
+     * Inserta una arista nueva en el heap.
+     *
+     * @param edge arista a insertar
      */
     public void insert(Edge edge) {
         ensureCapacity();
@@ -45,48 +46,51 @@ public class MinHeap {
         siftUp(size);
         size++;
     }
- 
+
     /**
-     * Removes and returns the edge with the smallest weight.
+     * Extrae y retorna la arista con menor peso.
      *
-     * @throws IllegalStateException if the heap is empty.
+     * @return arista mínima del heap
+     * @throws IllegalStateException si el heap está vacío
      */
     public Edge extractMin() {
         if (isEmpty())
             throw new IllegalStateException("Heap is empty");
- 
+
         Edge min = data[0];
- 
-        // Move the last element to the root and restore heap order
+
         size--;
         data[0] = data[size];
-        data[size] = null;  // let GC collect
+        data[size] = null;
         siftDown(0);
- 
+
         return min;
     }
- 
+
     /**
-     * Returns true if the heap has no elements.
+     * Verifica si el heap está vacío.
+     *
+     * @return {@code true} si no contiene aristas
      */
     public boolean isEmpty() {
         return size == 0;
     }
- 
+
     /**
-     * Returns the number of elements currently in the heap.
+     * Retorna el número de aristas actualmente en el heap.
+     *
+     * @return cantidad de elementos
      */
     public int size() {
         return size;
     }
- 
-    // -------------------------------------------------------------------------
-    // Internal helpers
-    // -------------------------------------------------------------------------
- 
+
     /**
-     * Moves the element at index i upward until the heap property is restored.
-     * Called after inserting a new element at the end.
+     * Mueve una arista hacia arriba hasta restaurar la propiedad del heap.
+     *
+     * <p>Se llama después de insertar una nueva arista al final.</p>
+     *
+     * @param i índice del elemento a subir
      */
     private void siftUp(int i) {
         while (i > 0) {
@@ -99,34 +103,45 @@ public class MinHeap {
             }
         }
     }
- 
+
     /**
-     * Moves the element at index i downward until the heap property is restored.
-     * Called after removing the root and placing the last element there.
+     * Mueve una arista hacia abajo hasta restaurar la propiedad del heap.
+     *
+     * <p>Se llama después de reemplazar la raíz con el último elemento.</p>
+     *
+     * @param i índice del elemento a bajar
      */
     private void siftDown(int i) {
         while (true) {
             int smallest = i;
             int left     = 2 * i + 1;
             int right    = 2 * i + 2;
- 
+
             if (left  < size && data[left].weight  < data[smallest].weight) smallest = left;
             if (right < size && data[right].weight < data[smallest].weight) smallest = right;
- 
-            if (smallest == i) break;   // already in the right place
- 
+
+            if (smallest == i) break;
+
             swap(i, smallest);
             i = smallest;
         }
     }
- 
+
+    /**
+     * Intercambia dos aristas en el heap.
+     *
+     * @param a índice del primer elemento
+     * @param b índice del segundo elemento
+     */
     private void swap(int a, int b) {
         Edge temp = data[a];
         data[a]   = data[b];
         data[b]   = temp;
     }
- 
-    /** Doubles the backing array if it is full. */
+
+    /**
+     * Amplia el arreglo interno si está lleno.
+     */
     private void ensureCapacity() {
         if (size == data.length) {
             Edge[] newData = new Edge[data.length * 2];
@@ -134,11 +149,12 @@ public class MinHeap {
             data = newData;
         }
     }
- 
-    // -------------------------------------------------------------------------
-    // Utility
-    // -------------------------------------------------------------------------
- 
+
+    /**
+     * Retorna una representación legible del heap.
+     *
+     * @return cadena con formato {@code [arista1, arista2, ...]}
+     */
     @Override
     public String toString() {
         if (size == 0) return "[]";

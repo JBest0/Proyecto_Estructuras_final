@@ -1,91 +1,118 @@
 /**
+ * Conjunto (set) genérico basado en HashMap.
  *
- * 
+ * <p>Implementa el contrato de Set usando un HashMap interno donde
+ * las claves son los elementos y los valores son siempre un objeto dummy.
+ * Proporciona operaciones de O(1) promedio.</p>
  *
- * @param <E> the type of elements
+ * @param <E> tipo de elementos en el conjunto
+ * @author Job Jimenez
+ * @version 1.0
+ * @see HashMap
  */
 public class HashSet<E> implements Set<E> {
- 
-    // Dummy value stored for every key — we only care about key presence.
+
+    /** Objeto dummy almacenado para cada clave. */
     private static final Object PRESENT = new Object();
- 
+
+    /** Mapa interno que almacena los elementos. */
     private final HashMap<E, Object> map;
- 
-    // -------------------------------------------------------------------------
-    // Constructors
-    // -------------------------------------------------------------------------
- 
+
+    /**
+     * Construye un conjunto vacío con capacidad y factor de carga por defecto.
+     */
     public HashSet() {
         map = new HashMap<>();
     }
- 
+
+    /**
+     * Construye un conjunto vacío con parámetros de capacidad especificados.
+     *
+     * @param initialCapacity número inicial de buckets
+     * @param loadFactor factor de carga para redimensionamiento
+     */
     public HashSet(int initialCapacity, float loadFactor) {
         map = new HashMap<>(initialCapacity, loadFactor);
     }
- 
-    // -------------------------------------------------------------------------
-    // Set interface
-    // -------------------------------------------------------------------------
- 
+
     /**
-     * Adds element to the set if not already present.
-     * Returns true if the set changed as a result.
+     * Agrega un elemento al conjunto si no está ya presente.
+     *
+     * @param element elemento a agregar
+     * @return {@code true} si el elemento se agregó (no existía previamente)
      */
     @Override
     public boolean add(E element) {
-        // put() returns null when there was no previous mapping (new key)
         return map.put(element, PRESENT) == null;
     }
- 
+
     /**
-     * Removes the specified element.
-     * Returns true if it was present.
+     * Elimina un elemento del conjunto si está presente.
+     *
+     * @param element elemento a eliminar
+     * @return {@code true} si el elemento fue encontrado y eliminado
      */
     @Override
     @SuppressWarnings("unchecked")
     public boolean remove(Object element) {
         return map.remove((E) element) == PRESENT;
     }
- 
+
     /**
-     * Returns true if the set contains the element.
+     * Verifica si el conjunto contiene un elemento específico.
+     *
+     * @param element elemento a buscar
+     * @return {@code true} si el elemento está en el conjunto
      */
     @Override
     @SuppressWarnings("unchecked")
     public boolean contains(Object element) {
         return map.containsKey((E) element);
     }
- 
+
+    /**
+     * Retorna el número de elementos en el conjunto.
+     *
+     * @return cantidad de elementos
+     */
     @Override
     public int size() {
         return map.size();
     }
- 
+
+    /**
+     * Verifica si el conjunto está vacío.
+     *
+     * @return {@code true} si no contiene elementos
+     */
     @Override
     public boolean isEmpty() {
         return map.isEmpty();
     }
- 
+
     /**
-     * Removes all elements from the set.
+     * Elimina todos los elementos del conjunto.
      */
     @Override
     public void clear() {
         map.clear();
     }
- 
+
     /**
-     * Returns an array containing all elements in the set.
+     * Retorna un arreglo con todos los elementos del conjunto.
+     *
+     * @return arreglo de elementos
      */
     @Override
     public Object[] toArray() {
         return map.keys();
     }
- 
-    // -------------------------------------------------------------------------
-    // toString
-    // -------------------------------------------------------------------------
- 
+
+    /**
+     * Retorna una representación legible del conjunto.
+     *
+     * @return cadena con formato {@code [elemento1, elemento2, ...]}
+     */
     @Override
     public String toString() {
         Object[] elements = toArray();
@@ -97,3 +124,4 @@ public class HashSet<E> implements Set<E> {
         }
         return sb.append("]").toString();
     }
+}

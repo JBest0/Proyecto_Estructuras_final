@@ -1,12 +1,12 @@
-//reciclado as is desde el proyecto anterior
-
-
-package client.data;
-
-/**
- * Lista simplemente enlazada genÃ©rica implementada manualmente.
+﻿/**
+ * Lista simplemente enlazada genérica implementada manualmente.
  *
- * @param <T> tipo de dato a almacenar.
+ * <p>Almacena elementos en nodos interconectados, proporcionando
+ * acceso O(n) pero inserción/eliminación eficiente en extremos.</p>
+ *
+ * @param <T> tipo de dato a almacenar
+ * @author Job Jimenez
+ * @version 1.0
  */
 public class LinkedList<T> {
 
@@ -17,9 +17,9 @@ public class LinkedList<T> {
     private int size;
 
     /**
-     * Nodo interno de la lista.
+     * Nodo interno de la lista enlazada.
      *
-     * @param <T> tipo de dato almacenado.
+     * @param <T> tipo de dato almacenado
      */
     private static final class Node<T> {
         private T data;
@@ -32,7 +32,7 @@ public class LinkedList<T> {
     }
 
     /**
-     * Crea una lista vacÃ­a.
+     * Crea una lista vacía.
      */
     public LinkedList() {
         this.head = null;
@@ -42,7 +42,7 @@ public class LinkedList<T> {
     /**
      * Agrega un elemento al inicio de la lista.
      *
-     * @param elemento elemento a insertar.
+     * @param elemento elemento a insertar
      */
     public void add(T elemento) {
         Node<T> newNode = new Node<>(elemento);
@@ -52,11 +52,11 @@ public class LinkedList<T> {
     }
 
     /**
-     * Remueve y retorna el elemento en el Ã­ndice indicado.
+     * Elimina y retorna el elemento en el índice indicado.
      *
-     * @param index Ã­ndice objetivo (base 0).
-     * @return elemento removido.
-     * @throws IndexOutOfBoundsException si el Ã­ndice es invÃ¡lido.
+     * @param index índice objetivo (base 0)
+     * @return elemento removido
+     * @throws IndexOutOfBoundsException si el índice es inválido
      */
     public T remove(int index) {
         validateIndex(index);
@@ -84,11 +84,11 @@ public class LinkedList<T> {
     }
 
     /**
-     * Retorna el elemento en un Ã­ndice especÃ­fico.
+     * Retorna el elemento en un índice especificado.
      *
-     * @param index Ã­ndice objetivo (base 0).
-     * @return elemento en ese Ã­ndice.
-     * @throws IndexOutOfBoundsException si el Ã­ndice es invÃ¡lido.
+     * @param index índice objetivo (base 0)
+     * @return elemento en ese índice
+     * @throws IndexOutOfBoundsException si el índice es inválido
      */
     public T get(int index) {
         validateIndex(index);
@@ -98,16 +98,16 @@ public class LinkedList<T> {
     /**
      * Retorna la cantidad de elementos en la lista.
      *
-     * @return tamaÃ±o actual.
+     * @return tamaño actual
      */
     public int size() {
         return size;
     }
 
     /**
-     * Indica si la lista estÃ¡ vacÃ­a.
+     * Indica si la lista está vacía.
      *
-     * @return true si no tiene elementos.
+     * @return {@code true} si no tiene elementos
      */
     public boolean isEmpty() {
         return size == 0;
@@ -116,7 +116,7 @@ public class LinkedList<T> {
     /**
      * Crea un iterador para recorrer la lista desde el inicio.
      *
-     * @return iterador de la lista.
+     * @return iterador de la lista
      */
     public Iterator<T> iterator() {
         return new LinkedListIterator();
@@ -139,10 +139,10 @@ public class LinkedList<T> {
     }
 
     /**
-     * Retorna el Ã­ndice de la primera ocurrencia del elemento.
+     * Retorna el índice de la primera ocurrencia del elemento.
      *
-     * @param elemento elemento a buscar.
-     * @return Ã­ndice encontrado o -1 si no existe.
+     * @param elemento elemento a buscar
+     * @return índice encontrado o -1 si no existe
      */
     public int indexOf(T elemento) {
         Node<T> current = head;
@@ -162,17 +162,17 @@ public class LinkedList<T> {
     /**
      * Indica si el elemento existe en la lista.
      *
-     * @param elemento elemento a verificar.
-     * @return true si existe.
+     * @param elemento elemento a verificar
+     * @return {@code true} si existe
      */
     public boolean contains(T elemento) {
         return indexOf(elemento) != -1;
     }
 
     /**
-     * Remueve el primer elemento de la lista.
+     * Elimina el primer elemento de la lista.
      *
-     * @throws IndexOutOfBoundsException si la lista estÃ¡ vacÃ­a.
+     * @throws IndexOutOfBoundsException si la lista está vacía
      */
     public void removeFirst() {
         remove(0);
@@ -181,18 +181,18 @@ public class LinkedList<T> {
     /**
      * Retorna el primer elemento de la lista.
      *
-     * @return primer elemento.
-     * @throws IndexOutOfBoundsException si la lista estÃ¡ vacÃ­a.
+     * @return primer elemento
+     * @throws IndexOutOfBoundsException si la lista está vacía
      */
     public T getFirst() {
         return get(0);
     }
 
     /**
-     * Remueve y retorna el Ãºltimo elemento de la lista.
+     * Elimina y retorna el último elemento de la lista.
      *
-     * @return Ãºltimo elemento removido.
-     * @throws IndexOutOfBoundsException si la lista estÃ¡ vacÃ­a.
+     * @return último elemento removido
+     * @throws IndexOutOfBoundsException si la lista está vacía
      */
     public T removeLast() {
         return remove(size - 1);
@@ -227,9 +227,10 @@ public class LinkedList<T> {
     }
 
     /**
-     * Valida que un Ã­ndice estÃ© dentro del rango permitido.
+     * Valida que un índice esté dentro del rango permitido.
      *
-     * @param index Ã­ndice a validar.
+     * @param index índice a validar
+     * @throws IndexOutOfBoundsException si el índice es inválido
      */
     private void validateIndex(int index) {
         if (index < 0 || index >= size) {
@@ -240,10 +241,10 @@ public class LinkedList<T> {
     }
 
     /**
-     * Obtiene el nodo en un Ã­ndice especÃ­fico.
+     * Obtiene el nodo en un índice especificado.
      *
-     * @param index Ã­ndice objetivo.
-     * @return nodo en ese Ã­ndice.
+     * @param index índice objetivo
+     * @return nodo en ese índice
      */
     private Node<T> getNodeAt(int index) {
         Node<T> current = head;
@@ -260,9 +261,9 @@ public class LinkedList<T> {
     /**
      * Compara dos referencias considerando valores nulos.
      *
-     * @param first primer valor.
-     * @param second segundo valor.
-     * @return true si son equivalentes.
+     * @param first primer valor
+     * @param second segundo valor
+     * @return {@code true} si son equivalentes
      */
     private boolean areEqual(T first, T second) {
         if (first == null) {
