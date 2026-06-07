@@ -1,3 +1,5 @@
+package cr.ac.tec.ce1103.logistec.graph;
+
 /**
  * Algoritmo de Prim para encontrar el Árbol de Expansión Mínimo (MST).
  *
@@ -30,6 +32,18 @@ public class Prim {
      */
     public Prim() {
         graph = new HashMap<>();
+    }
+
+    /**
+     * Construye un objeto Prim usando un grafo existente.
+     *
+     * <p>Útil cuando el grafo ya ha sido cargado desde un archivo JSON
+     * y se desea reutilizar su estructura sin volver a agregar aristas.</p>
+     *
+     * @param existingGraph lista de adyacencia previamente construida
+     */
+    public Prim(HashMap<Integer, ArrayList<Edge>> existingGraph) {
+        this.graph = existingGraph;
     }
 
     /**

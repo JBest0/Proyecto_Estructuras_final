@@ -1,4 +1,8 @@
-﻿/**
+package cr.ac.tec.ce1103.logistec.graph;
+
+import java.util.Iterator;
+
+/**
  * Lista simplemente enlazada genérica implementada manualmente.
  *
  * <p>Almacena elementos en nodos interconectados, proporcionando

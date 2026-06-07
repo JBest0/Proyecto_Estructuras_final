@@ -1,0 +1,290 @@
+package cr.ac.tec.ce1103.logistec.graph;
+
+/**
+ * Tabla hash genérica con resolución de colisiones por encadenamiento.
+ *
+ * <p>Implementa un mapa clave-valor usando hash table con buckets.
+ * Redimensiona automáticamente cuando el factor de carga se supera.
+ * Proporciona operaciones de O(1) promedio.</p>
+ *
+ * @param <K> tipo de las claves
+ * @param <V> tipo de los valores
+ * @author Job Jimenez
+ * @version 1.0
+ */
+public class HashMap<K, V> {
+
+    private static final int    DEFAULT_CAPACITY   = 16;
+    private static final float  DEFAULT_LOAD_FACTOR = 0.75f;
+
+    /**
+     * Nodo interno de la tabla hash para almacenar pares clave-valor.
+     *
+     * @param <K> tipo de la clave
+     * @param <V> tipo del valor
+     */
+    private static class Node<K, V> {
+        final K key;
+        V value;
+        Node<K, V> next;
+
+        Node(K key, V value, Node<K, V> next) {
+            this.key   = key;
+            this.value = value;
+            this.next  = next;
+        }
+    }
+
+    /** Arreglo de buckets para almacenar cadenas de nodos. */
+    private Node<K, V>[] buckets;
+
+    /** Número actual de pares clave-valor. */
+    private int size;
+
+    /** Factor de carga para determinar cuándo redimensionar. */
+    private final float loadFactor;
+
+    /**
+     * Construye un HashMap vacío con capacidad y factor de carga por defecto.
+     */
+    @SuppressWarnings("unchecked")
+    public HashMap() {
+        buckets    = new Node[DEFAULT_CAPACITY];
+        loadFactor = DEFAULT_LOAD_FACTOR;
+    }
+
+    /**
+     * Construye un HashMap vacío con parámetros especificados.
+     *
+     * @param initialCapacity número inicial de buckets
+     * @param loadFactor factor de carga para redimensionamiento
+     * @throws IllegalArgumentException si los parámetros son inválidos
+     */
+    @SuppressWarnings("unchecked")
+    public HashMap(int initialCapacity, float loadFactor) {
+        if (initialCapacity < 1)
+            throw new IllegalArgumentException("Capacity must be >= 1");
+        if (loadFactor <= 0 || Float.isNaN(loadFactor))
+            throw new IllegalArgumentException("Load factor must be positive");
+        buckets          = new Node[initialCapacity];
+        this.loadFactor  = loadFactor;
+    }
+
+    /**
+     * Asocia una clave con un valor en el mapa.
+     *
+     * <p>Si la clave ya existe, sobrescribe su valor anterior.
+     * Dispara redimensionamiento si el factor de carga se supera.</p>
+     *
+     * @param key   clave
+     * @param value valor a asociar
+     * @return valor anterior para esa clave, o {@code null} si no existía
+     */
+    public V put(K key, V value) {
+        int idx  = bucketIndex(key);
+        Node<K, V> head = buckets[idx];
+
+        for (Node<K, V> n = head; n != null; n = n.next) {
+            if (keysEqual(n.key, key)) {
+                V old = n.value;
+                n.value = value;
+                return old;
+            }
+        }
+
+        buckets[idx] = new Node<>(key, value, head);
+        size++;
+
+        if (size > buckets.length * loadFactor)
+            resize();
+
+        return null;
+    }
+
+    /**
+     * Obtiene el valor asociado a una clave.
+     *
+     * @param key clave a buscar
+     * @return valor asociado, o {@code null} si no existe
+     */
+    public V get(K key) {
+        Node<K, V> n = findNode(key);
+        return n == null ? null : n.value;
+    }
+
+    /**
+     * Elimina un par clave-valor del mapa.
+     *
+     * @param key clave a eliminar
+     * @return valor que tenía asociado, o {@code null} si no existía
+     */
+    public V remove(K key) {
+        int idx  = bucketIndex(key);
+        Node<K, V> prev = null;
+        Node<K, V> curr = buckets[idx];
+
+        while (curr != null) {
+            if (keysEqual(curr.key, key)) {
+                if (prev == null)
+                    buckets[idx] = curr.next;
+                else
+                    prev.next = curr.next;
+                size--;
+                return curr.value;
+            }
+            prev = curr;
+            curr = curr.next;
+        }
+        return null;
+    }
+
+    /**
+     * Verifica si el mapa contiene una clave específica.
+     *
+     * @param key clave a buscar
+     * @return {@code true} si la clave existe
+     */
+    public boolean containsKey(K key) {
+        return findNode(key) != null;
+    }
+
+    /**
+     * Verifica si alguna clave está asociada al valor especificado.
+     *
+     * @param value valor a buscar
+     * @return {@code true} si existe al menos una clave con ese valor
+     */
+    public boolean containsValue(V value) {
+        for (Node<K, V> head : buckets)
+            for (Node<K, V> n = head; n != null; n = n.next)
+                if (value == null ? n.value == null : value.equals(n.value))
+                    return true;
+        return false;
+    }
+
+    /**
+     * Retorna el número de pares clave-valor en el mapa.
+     *
+     * @return cantidad de elementos
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Verifica si el mapa está vacío.
+     *
+     * @return {@code true} si no contiene elementos
+     */
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    /**
+     * Elimina todos los pares clave-valor del mapa.
+     */
+    @SuppressWarnings("unchecked")
+    public void clear() {
+        buckets = new Node[DEFAULT_CAPACITY];
+        size    = 0;
+    }
+
+    /**
+     * Retorna un arreglo con todas las claves del mapa.
+     *
+     * @return arreglo de claves
+     */
+    @SuppressWarnings("unchecked")
+    public Object[] keys() {
+        Object[] result = new Object[size];
+        int idx = 0;
+        for (Node<K, V> head : buckets)
+            for (Node<K, V> n = head; n != null; n = n.next)
+                result[idx++] = n.key;
+        return result;
+    }
+
+    /**
+     * Retorna un arreglo con todos los valores del mapa.
+     *
+     * @return arreglo de valores
+     */
+    public Object[] values() {
+        Object[] result = new Object[size];
+        int idx = 0;
+        for (Node<K, V> head : buckets)
+            for (Node<K, V> n = head; n != null; n = n.next)
+                result[idx++] = n.value;
+        return result;
+    }
+
+    /**
+     * Busca un nodo por su clave.
+     *
+     * @param key clave a buscar
+     * @return nodo encontrado, o {@code null}
+     */
+    private Node<K, V> findNode(K key) {
+        for (Node<K, V> n = buckets[bucketIndex(key)]; n != null; n = n.next)
+            if (keysEqual(n.key, key))
+                return n;
+        return null;
+    }
+
+    /**
+     * Calcula el índice del bucket para una clave.
+     *
+     * @param key clave
+     * @return índice del bucket
+     */
+    private int bucketIndex(K key) {
+        if (key == null) return 0;
+        int h = key.hashCode();
+        h ^= (h >>> 16);
+        return Math.abs(h) % buckets.length;
+    }
+
+    /**
+     * Compara dos claves considerando valores nulos.
+     *
+     * @param a primera clave
+     * @param b segunda clave
+     * @return {@code true} si son iguales
+     */
+    private boolean keysEqual(K a, K b) {
+        return a == null ? b == null : a.equals(b);
+    }
+
+    /**
+     * Redimensiona el arreglo de buckets al doble y rehashea todas las entradas.
+     */
+    @SuppressWarnings("unchecked")
+    private void resize() {
+        Node<K, V>[] old = buckets;
+        buckets = new Node[old.length * 2];
+        size    = 0;
+
+        for (Node<K, V> head : old)
+            for (Node<K, V> n = head; n != null; n = n.next)
+                put(n.key, n.value);
+    }
+
+    /**
+     * Retorna una representación legible del mapa.
+     *
+     * @return cadena con formato {@code {clave=valor, ...}}
+     */
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("{");
+        boolean first = true;
+        for (Node<K, V> head : buckets) {
+            for (Node<K, V> n = head; n != null; n = n.next) {
+                if (!first) sb.append(", ");
+                sb.append(n.key).append("=").append(n.value);
+                first = false;
+            }
+        }
+        return sb.append("}").toString();
+    }
+}

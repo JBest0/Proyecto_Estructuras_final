@@ -1,0 +1,136 @@
+{
+  "ciudad": {
+    "vertices": [
+      {"id": "AA", "tipo": "INTERSECCION", "x": 100, "y": 60},
+      {"id": "AB", "tipo": "INTERSECCION", "x": 240, "y": 60},
+      {"id": "AC", "tipo": "INTERSECCION", "x": 380, "y": 60},
+      {"id": "AD", "tipo": "INTERSECCION", "x": 520, "y": 60},
+      {"id": "AE", "tipo": "INTERSECCION", "x": 660, "y": 60},
+
+      {"id": "BA", "tipo": "INTERSECCION", "x": 100, "y": 170},
+      {"id": "BB", "tipo": "INTERSECCION", "x": 240, "y": 170},
+      {"id": "BC", "tipo": "DEPOT",       "x": 380, "y": 170},
+      {"id": "BD", "tipo": "INTERSECCION", "x": 520, "y": 170},
+      {"id": "BE", "tipo": "INTERSECCION", "x": 660, "y": 170},
+
+      {"id": "CA", "tipo": "INTERSECCION", "x": 100, "y": 280},
+      {"id": "CB", "tipo": "INTERSECCION", "x": 240, "y": 280},
+      {"id": "CC", "tipo": "INTERSECCION", "x": 380, "y": 280},
+      {"id": "CD", "tipo": "INTERSECCION", "x": 520, "y": 280},
+      {"id": "CE", "tipo": "INTERSECCION", "x": 660, "y": 280},
+
+      {"id": "DA", "tipo": "INTERSECCION", "x": 100, "y": 390},
+      {"id": "DB", "tipo": "INTERSECCION", "x": 240, "y": 390},
+      {"id": "DC", "tipo": "INTERSECCION", "x": 380, "y": 390},
+      {"id": "DD", "tipo": "INTERSECCION", "x": 520, "y": 390},
+      {"id": "DE", "tipo": "INTERSECCION", "x": 660, "y": 390},
+
+      {"id": "EA", "tipo": "INTERSECCION", "x": 100, "y": 500},
+      {"id": "EB", "tipo": "INTERSECCION", "x": 240, "y": 500},
+      {"id": "EC", "tipo": "INTERSECCION", "x": 380, "y": 500},
+      {"id": "ED", "tipo": "INTERSECCION", "x": 520, "y": 500},
+      {"id": "EE", "tipo": "INTERSECCION", "x": 660, "y": 500},
+
+      {"id": "FA", "tipo": "INTERSECCION", "x": 100, "y": 610},
+      {"id": "FB", "tipo": "INTERSECCION", "x": 240, "y": 610},
+      {"id": "FC", "tipo": "INTERSECCION", "x": 380, "y": 610},
+      {"id": "FD", "tipo": "INTERSECCION", "x": 520, "y": 610},
+      {"id": "FE", "tipo": "INTERSECCION", "x": 660, "y": 610}
+    ],
+
+    "aristas": [
+      {"u": "AA", "v": "AB", "distancia": 180},
+      {"u": "AB", "v": "AC", "distancia": 200},
+      {"u": "AC", "v": "AD", "distancia": 160},
+      {"u": "AD", "v": "AE", "distancia": 190},
+
+      {"u": "BA", "v": "BB", "distancia": 170},
+      {"u": "BB", "v": "BC", "distancia": 150},
+      {"u": "BC", "v": "BD", "distancia": 180},
+      {"u": "BD", "v": "BE", "distancia": 160},
+
+      {"u": "CA", "v": "CB", "distancia": 140},
+      {"u": "CB", "v": "CC", "distancia": 210},
+      {"u": "CC", "v": "CD", "distancia": 170},
+      {"u": "CD", "v": "CE", "distancia": 200},
+
+      {"u": "DA", "v": "DB", "distancia": 190},
+      {"u": "DB", "v": "DC", "distancia": 160},
+      {"u": "DC", "v": "DD", "distancia": 150},
+      {"u": "DD", "v": "DE", "distancia": 180},
+
+      {"u": "EA", "v": "EB", "distancia": 170},
+      {"u": "EB", "v": "EC", "distancia": 200},
+      {"u": "EC", "v": "ED", "distancia": 190},
+      {"u": "ED", "v": "EE", "distancia": 160},
+
+      {"u": "FA", "v": "FB", "distancia": 150},
+      {"u": "FB", "v": "FC", "distancia": 180},
+      {"u": "FC", "v": "FD", "distancia": 200},
+      {"u": "FD", "v": "FE", "distancia": 170},
+
+      {"u": "AA", "v": "BA", "distancia": 140},
+      {"u": "BA", "v": "CA", "distancia": 150},
+      {"u": "CA", "v": "DA", "distancia": 160},
+      {"u": "DA", "v": "EA", "distancia": 140},
+      {"u": "EA", "v": "FA", "distancia": 170},
+
+      {"u": "AB", "v": "BB", "distancia": 130},
+      {"u": "BB", "v": "CB", "distancia": 160},
+      {"u": "CB", "v": "DB", "distancia": 150},
+      {"u": "DB", "v": "EB", "distancia": 170},
+      {"u": "EB", "v": "FB", "distancia": 140},
+
+      {"u": "AC", "v": "BC", "distancia": 180},
+      {"u": "BC", "v": "CC", "distancia": 140},
+      {"u": "CC", "v": "DC", "distancia": 160},
+      {"u": "DC", "v": "EC", "distancia": 150},
+      {"u": "EC", "v": "FC", "distancia": 180},
+
+      {"u": "AD", "v": "BD", "distancia": 150},
+      {"u": "BD", "v": "CD", "distancia": 170},
+      {"u": "CD", "v": "DD", "distancia": 140},
+      {"u": "DD", "v": "ED", "distancia": 160},
+      {"u": "ED", "v": "FD", "distancia": 190},
+
+      {"u": "AE", "v": "BE", "distancia": 160},
+      {"u": "BE", "v": "CE", "distancia": 140},
+      {"u": "CE", "v": "DE", "distancia": 180},
+      {"u": "DE", "v": "EE", "distancia": 150},
+      {"u": "EE", "v": "FE", "distancia": 170},
+
+      {"u": "AA", "v": "BB", "distancia": 220},
+      {"u": "AB", "v": "BC", "distancia": 240},
+      {"u": "BB", "v": "CA", "distancia": 200},
+      {"u": "BC", "v": "CB", "distancia": 180},
+      {"u": "CA", "v": "DB", "distancia": 230},
+      {"u": "DC", "v": "ED", "distancia": 210},
+      {"u": "EA", "v": "FB", "distancia": 190}
+    ]
+  },
+
+  "paquetes": [
+    {"id": "P01", "destino": "AE", "peso": 8,  "prioridad": 1},
+    {"id": "P02", "destino": "CA", "peso": 5,  "prioridad": 1},
+    {"id": "P03", "destino": "FC", "peso": 12, "prioridad": 1},
+    {"id": "P04", "destino": "BD", "peso": 4,  "prioridad": 2},
+    {"id": "P05", "destino": "EB", "peso": 10, "prioridad": 2},
+    {"id": "P06", "destino": "AD", "peso": 6,  "prioridad": 2},
+    {"id": "P07", "destino": "DE", "peso": 15, "prioridad": 2},
+    {"id": "P08", "destino": "AA", "peso": 3,  "prioridad": 3},
+    {"id": "P09", "destino": "FA", "peso": 7,  "prioridad": 3},
+    {"id": "P10", "destino": "CC", "peso": 9,  "prioridad": 3},
+    {"id": "P11", "destino": "EE", "peso": 11, "prioridad": 3},
+    {"id": "P12", "destino": "FB", "peso": 6,  "prioridad": 3},
+    {"id": "P13", "destino": "CE", "peso": 14, "prioridad": 1},
+    {"id": "P14", "destino": "DA", "peso": 5,  "prioridad": 2},
+    {"id": "P15", "destino": "FD", "peso": 8,  "prioridad": 3},
+    {"id": "P16", "destino": "BE", "peso": 10, "prioridad": 1}
+  ],
+
+  "camiones": [
+    {"id": "C01", "capacidad": 40},
+    {"id": "C02", "capacidad": 50},
+    {"id": "C03", "capacidad": 35}
+  ]
+}

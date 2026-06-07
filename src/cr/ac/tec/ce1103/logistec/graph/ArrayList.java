@@ -1,0 +1,237 @@
+package cr.ac.tec.ce1103.logistec.graph;
+
+/**
+ * Lista genérica dinámica con redimensionamiento automático.
+ *
+ * <p>Implementa una lista basada en array que crece automáticamente
+ * cuando alcanza su capacidad máxima. Proporciona operaciones de
+ * inserción, eliminación y consulta en O(n) en el peor caso.</p>
+ *
+ * @param <T> tipo de elemento almacenado en la lista
+ * @author Job Jimenez
+ * @version 1.0
+ */
+public class ArrayList<T> {
+
+    private static final int DEFAULT_CAPACITY = 10;
+
+    /** Arreglo interno que almacena los elementos. */
+    private Object[] data;
+
+    /** Número actual de elementos en la lista. */
+    private int size;
+
+    /**
+     * Construye una lista vacía con capacidad inicial por defecto.
+     */
+    public ArrayList() {
+        data = new Object[DEFAULT_CAPACITY];
+        size = 0;
+    }
+
+    /**
+     * Construye una lista vacía con capacidad inicial especificada.
+     *
+     * @param initialCapacity capacidad inicial deseada
+     * @throws IllegalArgumentException si la capacidad es negativa
+     */
+    public ArrayList(int initialCapacity) {
+        if (initialCapacity < 0)
+            throw new IllegalArgumentException("Capacity must be non-negative: " + initialCapacity);
+        data = new Object[initialCapacity];
+        size = 0;
+    }
+
+    /**
+     * Agrega un elemento al final de la lista.
+     *
+     * @param element elemento a agregar
+     */
+    public void add(T element) {
+        ensureCapacity(size + 1);
+        data[size++] = element;
+    }
+
+    /**
+     * Inserta un elemento en el índice especificado, desplazando
+     * los elementos posteriores hacia la derecha.
+     *
+     * @param index índice en el cual insertar
+     * @param element elemento a insertar
+     * @throws IndexOutOfBoundsException si el índice es inválido
+     */
+    public void add(int index, T element) {
+        checkIndexForAdd(index);
+        ensureCapacity(size + 1);
+        System.arraycopy(data, index, data, index + 1, size - index);
+        data[index] = element;
+        size++;
+    }
+
+    /**
+     * Obtiene el elemento en el índice especificado.
+     *
+     * @param index índice del elemento
+     * @return elemento en ese índice
+     * @throws IndexOutOfBoundsException si el índice es inválido
+     */
+    @SuppressWarnings("unchecked")
+    public T get(int index) {
+        checkIndex(index);
+        return (T) data[index];
+    }
+
+    /**
+     * Reemplaza el elemento en el índice especificado.
+     *
+     * @param index índice del elemento a reemplazar
+     * @param element nuevo elemento
+     * @return elemento anterior en ese índice
+     * @throws IndexOutOfBoundsException si el índice es inválido
+     */
+    @SuppressWarnings("unchecked")
+    public T set(int index, T element) {
+        checkIndex(index);
+        T old = (T) data[index];
+        data[index] = element;
+        return old;
+    }
+
+    /**
+     * Elimina y retorna el elemento en el índice especificado.
+     *
+     * @param index índice del elemento a eliminar
+     * @return elemento eliminado
+     * @throws IndexOutOfBoundsException si el índice es inválido
+     */
+    @SuppressWarnings("unchecked")
+    public T remove(int index) {
+        checkIndex(index);
+        T removed = (T) data[index];
+        int numMoved = size - index - 1;
+        if (numMoved > 0)
+            System.arraycopy(data, index + 1, data, index, numMoved);
+        data[--size] = null;
+        return removed;
+    }
+
+    /**
+     * Elimina la primera ocurrencia del elemento especificado.
+     *
+     * @param o elemento a eliminar
+     * @return {@code true} si el elemento fue encontrado y eliminado
+     */
+    public boolean remove(Object o) {
+        for (int i = 0; i < size; i++) {
+            if (o == null ? data[i] == null : o.equals(data[i])) {
+                remove(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Retorna el número de elementos en la lista.
+     *
+     * @return cantidad de elementos
+     */
+    public int size() {
+        return size;
+    }
+
+    /**
+     * Verifica si la lista está vacía.
+     *
+     * @return {@code true} si no contiene elementos
+     */
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    /**
+     * Verifica si la lista contiene un elemento específico.
+     *
+     * @param o elemento a buscar
+     * @return {@code true} si el elemento está en la lista
+     */
+    public boolean contains(Object o) {
+        return indexOf(o) >= 0;
+    }
+
+    /**
+     * Retorna el índice de la primera ocurrencia del elemento.
+     *
+     * @param o elemento a buscar
+     * @return índice del elemento, o -1 si no se encuentra
+     */
+    public int indexOf(Object o) {
+        for (int i = 0; i < size; i++) {
+            if (o == null ? data[i] == null : o.equals(data[i]))
+                return i;
+        }
+        return -1;
+    }
+
+    /**
+     * Elimina todos los elementos de la lista.
+     */
+    public void clear() {
+        for (int i = 0; i < size; i++)
+            data[i] = null;
+        size = 0;
+    }
+
+    /**
+     * Amplía la capacidad del arreglo interno si es necesario.
+     *
+     * @param minCapacity capacidad mínima requerida
+     */
+    private void ensureCapacity(int minCapacity) {
+        if (minCapacity > data.length) {
+            int newCapacity = Math.max(data.length * 2, minCapacity);
+            Object[] newData = new Object[newCapacity];
+            System.arraycopy(data, 0, newData, 0, size);
+            data = newData;
+        }
+    }
+
+    /**
+     * Valida que un índice sea válido para acceso.
+     *
+     * @param index índice a validar
+     * @throws IndexOutOfBoundsException si el índice es inválido
+     */
+    private void checkIndex(int index) {
+        if (index < 0 || index >= size)
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+    }
+
+    /**
+     * Valida que un índice sea válido para inserción.
+     *
+     * @param index índice a validar
+     * @throws IndexOutOfBoundsException si el índice es inválido
+     */
+    private void checkIndexForAdd(int index) {
+        if (index < 0 || index > size)
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+    }
+
+    /**
+     * Retorna una representación legible de la lista.
+     *
+     * @return cadena con formato {@code [elemento1, elemento2, ...]}
+     */
+    @Override
+    public String toString() {
+        if (size == 0) return "[]";
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < size; i++) {
+            sb.append(data[i]);
+            if (i < size - 1) sb.append(", ");
+        }
+        sb.append("]");
+        return sb.toString();
+    }
+}
