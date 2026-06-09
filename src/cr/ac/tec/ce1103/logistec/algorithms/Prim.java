@@ -1,4 +1,10 @@
-package cr.ac.tec.ce1103.logistec.graph;
+package cr.ac.tec.ce1103.logistec.algorithms;
+
+import cr.ac.tec.ce1103.logistec.graph.ArrayList;
+import cr.ac.tec.ce1103.logistec.graph.Edge;
+import cr.ac.tec.ce1103.logistec.graph.HashMap;
+import cr.ac.tec.ce1103.logistec.graph.HashSet;
+import cr.ac.tec.ce1103.logistec.graph.MinHeap;
 
 /**
  * Algoritmo de Prim para encontrar el Árbol de Expansión Mínimo (MST).
@@ -16,11 +22,11 @@ package cr.ac.tec.ce1103.logistec.graph;
  *
  * @author Job Jimenez
  * @version 1.0
- * @see Edge
- * @see MinHeap
- * @see ArrayList
- * @see HashMap
- * @see HashSet
+ * @see cr.ac.tec.ce1103.logistec.graph.Edge
+ * @see cr.ac.tec.ce1103.logistec.graph.MinHeap
+ * @see cr.ac.tec.ce1103.logistec.graph.ArrayList
+ * @see cr.ac.tec.ce1103.logistec.graph.HashMap
+ * @see cr.ac.tec.ce1103.logistec.graph.HashSet
  */
 public class Prim {
 

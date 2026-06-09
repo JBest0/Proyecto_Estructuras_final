@@ -6,7 +6,7 @@ import cr.ac.tec.ce1103.logistec.algorithms.Warshall;
 import cr.ac.tec.ce1103.logistec.graph.ArrayList;
 import cr.ac.tec.ce1103.logistec.graph.Edge;
 import cr.ac.tec.ce1103.logistec.graph.HashMap;
-import cr.ac.tec.ce1103.logistec.graph.Prim;
+import cr.ac.tec.ce1103.logistec.algorithms.Prim;
 import cr.ac.tec.ce1103.logistec.io.GraphLoader;
 import cr.ac.tec.ce1103.logistec.io.GraphLoader.GraphData;
 import cr.ac.tec.ce1103.logistec.model.Package;

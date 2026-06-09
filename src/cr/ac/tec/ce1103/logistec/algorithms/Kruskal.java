@@ -13,7 +13,7 @@ import cr.ac.tec.ce1103.logistec.graph.Edge;
  * @author Job Jimenez
  * @version 1.0
  * @see cr.ac.tec.ce1103.logistec.graph.UnionFind
- * @see cr.ac.tec.ce1103.logistec.graph.Prim
+ * @see cr.ac.tec.ce1103.logistec.algorithms.Prim
  */
 public class Kruskal {
 
