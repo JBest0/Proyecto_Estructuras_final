@@ -1,130 +1,144 @@
-public class GrafoNoDirigido<T> {
+package cr.ac.tec.ce1103.logistec.graph;
 
-    linkedlist<vertice<T>> listaDeAdyacencia = new linkedlist<>();
+/**
+ * Grafo no dirigido y ponderado.
+ *
+ * <p>Estructura de datos que representa un grafo no dirigido con aristas
+ * ponderadas. Los nodos se identifican mediante un entero ({@code int})
+ * y las aristas usan la clase {@link Edge} existente en el proyecto.
+ * La representación interna es una lista de adyacencia basada en
+ * {@link HashMap} y {@link ArrayList}, compatible directamente con los
+ * algoritmos del paquete
+ * ({@link cr.ac.tec.ce1103.logistec.algorithms.Prim},
+ * {@link cr.ac.tec.ce1103.logistec.algorithms.BFS},
+ * {@link cr.ac.tec.ce1103.logistec.algorithms.DFS}).</p>
+ *
+ * <p><strong>Complejidad:</strong>
+ * <ul>
+ *   <li>Agregar vértice: O(1) promedio</li>
+ *   <li>Agregar arista: O(1) promedio</li>
+ *   <li>Verificar existencia de vértice: O(1) promedio</li>
+ * </ul>
+ * </p>
+ *
+ * @author Jeffry Vargas Chavarría
+ * @version 1.0
+ * @see Edge
+ * @see HashMap
+ * @see ArrayList
+ * @see cr.ac.tec.ce1103.logistec.algorithms.Prim
+ * @see cr.ac.tec.ce1103.logistec.algorithms.DFS
+ */
+public class GrafoNoDirigido {
 
+    /** Lista de adyacencia: nodo -> lista de aristas incidentes. */
+    private HashMap<Integer, ArrayList<Edge>> listaAdyacencia;
+
+    /**
+     * Construye un grafo no dirigido vacío.
+     */
     public GrafoNoDirigido() {
+        this.listaAdyacencia = new HashMap<>();
     }
 
-    public void agregarVertice(T dato) {
-        if (buscarVertice(dato) != null) {
-            System.out.println("El vertice ya existe");
-            return;
+    /**
+     * Agrega un vértice al grafo si no existe previamente.
+     *
+     * @param id identificador numérico del vértice
+     */
+    public void agregarVertice(int id) {
+        if (!listaAdyacencia.containsKey(id)) {
+            listaAdyacencia.put(id, new ArrayList<>());
+        }
+    }
+
+    /**
+     * Agrega una arista no dirigida y ponderada entre dos nodos.
+     *
+     * <p>Almacena la arista en ambas direcciones para mantener la
+     * simetría del grafo no dirigido. Si alguno de los nodos no existe,
+     * lo crea automáticamente.</p>
+     *
+     * @param origen  nodo de origen
+     * @param destino nodo de destino
+     * @param peso    peso de la arista
+     */
+    public void agregarArista(int origen, int destino, double peso) {
+        if (!listaAdyacencia.containsKey(origen)) {
+            listaAdyacencia.put(origen, new ArrayList<>());
+        }
+        if (!listaAdyacencia.containsKey(destino)) {
+            listaAdyacencia.put(destino, new ArrayList<>());
         }
 
-        vertice<T> nuevoVertice = new vertice<>(dato);
-        listaDeAdyacencia.agregarNodo(nuevoVertice);
+        listaAdyacencia.get(origen).add(new Edge(origen, destino, peso));
+        listaAdyacencia.get(destino).add(new Edge(destino, origen, peso));
     }
 
-    public vertice<T> buscarVertice(T dato) {
-        linkedlist<vertice<T>>.Nodo temp = listaDeAdyacencia.head;
-
-        while (temp != null) {
-            vertice<T> actual = temp.getValor();
-
-            if (actual.valor.equals(dato)) {
-                return actual;
-            }
-
-            temp = temp.getNext();
-        }
-
-        return null;
+    /**
+     * Verifica si un vértice existe en el grafo.
+     *
+     * @param id identificador del vértice a buscar
+     * @return {@code true} si el vértice está en el grafo
+     */
+    public boolean existeVertice(int id) {
+        return listaAdyacencia.containsKey(id);
     }
 
-    public void agregarArista(T datoOrigen, T datoDestino, int peso) {
-        vertice<T> origen = buscarVertice(datoOrigen);
-        vertice<T> destino = buscarVertice(datoDestino);
-
-        if (origen == null) {
-            System.out.println("El vertice origen no existe");
-            return;
-        }
-
-        if (destino == null) {
-            System.out.println("El vertice destino no existe");
-            return;
-        }
-
-        origen.crearArista(destino, peso);
-        destino.crearArista(origen, peso);
-    }
-    public void DFS(T datoInicio) {
-    vertice<T> inicio = buscarVertice(datoInicio);
-
-    if (inicio == null) {
-        System.out.println("El vertice inicial no existe");
-        return;
+    /**
+     * Retorna el número de vértices en el grafo.
+     *
+     * @return cantidad de vértices
+     */
+    public int cantidadVertices() {
+        return listaAdyacencia.size();
     }
 
-    linkedlist<vertice<T>> visitados = new linkedlist<>();
-
-    DFSRecursivo(inicio, visitados);
- }
-
-    private void DFSRecursivo(vertice<T> actual, linkedlist<vertice<T>> visitados) {
-    visitados.agregarNodo(actual);
-
-    System.out.println(actual.valor);
-
-    linkedlist<arista<T>>.Nodo tempArista = actual.listaDeAristas.head;
-
-    while (tempArista != null) {
-        arista<T> aristaActual = tempArista.getValor();
-        vertice<T> vecino = aristaActual.destino;
-
-        if (!visitados.buscar(vecino)) {
-            DFSRecursivo(vecino, visitados);
-        }
-
-        tempArista = tempArista.getNext();
-     }
+    /**
+     * Retorna las aristas incidentes de un nodo.
+     *
+     * @param nodo identificador del nodo
+     * @return lista de aristas que salen del nodo, o {@code null} si no existe
+     */
+    public ArrayList<Edge> getAristas(int nodo) {
+        return listaAdyacencia.get(nodo);
     }
+
+    /**
+     * Retorna la lista de adyacencia completa del grafo.
+     *
+     * <p>Este método permite pasar el grafo a algoritmos como
+     * {@link cr.ac.tec.ce1103.logistec.algorithms.Prim} o
+     * {@link cr.ac.tec.ce1103.logistec.algorithms.DFS} que operan sobre la misma
+     * representación interna.</p>
+     *
+     * @return mapa de adyacencia completo
+     */
+    public HashMap<Integer, ArrayList<Edge>> getListaAdyacencia() {
+        return listaAdyacencia;
+    }
+
+    /**
+     * Imprime la representación del grafo en consola.
+     *
+     * <p>Muestra cada vértice seguido de sus aristas incidentes
+     * con el formato {@code origen -> destino(peso) ...}.</p>
+     */
     public void mostrarGrafo() {
-    linkedlist<vertice<T>>.Nodo temp = listaDeAdyacencia.head;
+        Object[] claves = listaAdyacencia.keys();
+        for (int i = 0; i < claves.length; i++) {
+            int nodo = (Integer) claves[i];
+            System.out.print(nodo + " -> ");
 
-    while (temp != null) {
-        vertice<T> actual = temp.getValor();
-
-        System.out.print(actual.valor + " -> ");
-
-        linkedlist<arista<T>>.Nodo tempArista = actual.listaDeAristas.head;
-
-        while (tempArista != null) {
-            arista<T> aristaActual = tempArista.getValor();
-
-            System.out.print(aristaActual.destino.valor + "(" + aristaActual.peso + ") ");
-
-            tempArista = tempArista.getNext();
+            ArrayList<Edge> aristas = listaAdyacencia.get(nodo);
+            if (aristas != null) {
+                for (int j = 0; j < aristas.size(); j++) {
+                    Edge e = aristas.get(j);
+                    System.out.print(e.to + "(" + e.weight + ") ");
+                }
+            }
+            System.out.println();
         }
-
-        System.out.println();
-
-        temp = temp.getNext();
-    }
-    }
-    }
-class arista<T> {
-
-    int peso;
-    vertice<T> destino;
-
-    public arista(vertice<T> vertice, int peso) {
-        this.destino = vertice;
-        this.peso = peso;
-    }
-}
-class vertice<T> {
-
-    T valor;
-    linkedlist<arista<T>> listaDeAristas = new linkedlist<>();
-
-    public vertice(T dato) {
-        this.valor = dato;
-    }
-
-    public void crearArista(vertice<T> vertice, int peso) {
-        arista<T> nuevaArista = new arista<>(vertice, peso);
-        listaDeAristas.agregarNodo(nuevaArista);
     }
 }
 
