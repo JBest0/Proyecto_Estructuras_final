@@ -68,6 +68,7 @@ public class RoutePlanner {
 
             if (mejor != null) {
                 mejor.agregarCarga(p.getPeso());
+                mejor.getParadas().add(p.getDestino()); //Agregue esta linea porque el camión no guardaba qué paquetes lleva, esto agrega el destino como parada
             } else {
                 p.marcarRechazado();
             }
