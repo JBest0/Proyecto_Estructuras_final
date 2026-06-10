@@ -47,6 +47,16 @@ public class BFS {
     }
 
     /**
+     * Retorna la lista de vecinos de un nodo en el grafo no dirigido.
+     *
+     * @param node nodo del que se desean los vecinos
+     * @return lista de vecinos, o null si el nodo no existe
+     */
+    public ArrayList<Integer> getNeighbors(int node) {
+        return graph.get(node);
+    }
+
+    /**
      * Ejecuta BFS desde el nodo especificado, imprimiendo cada nodo visitado.
      *
      * @param start nodo inicial del recorrido

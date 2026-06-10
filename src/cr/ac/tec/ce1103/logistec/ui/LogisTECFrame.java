@@ -9,6 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -43,13 +44,18 @@ public class LogisTECFrame extends JFrame {
 
     private final GraphData data;
 
+    /** Rutas (lista de índices de vértices) por camión para dibujar. */
+    private final HashMap<String, ArrayList<Integer>> truckRutas;
+
     /**
-     * Construye la ventana principal con el grafo y el reporte.
+     * Construye la ventana principal con el grafo, las rutas y el reporte.
      *
-     * @param data datos del caso cargados desde el JSON
+     * @param data       datos del caso cargados desde el JSON
+     * @param truckRutas rutas de cada camión (índices de vértices en orden)
      */
-    public LogisTECFrame(GraphData data) {
+    public LogisTECFrame(GraphData data, HashMap<String, ArrayList<Integer>> truckRutas) {
         this.data = data;
+        this.truckRutas = truckRutas;
         initComponents();
     }
 
@@ -105,6 +111,20 @@ public class LogisTECFrame extends JFrame {
         sb.append("\nCamiones: ").append(data.camiones.size());
         for (int i = 0; i < data.camiones.size(); i++) {
             sb.append(" | ").append(data.camiones.get(i));
+        }
+        // Rutas de cada camión
+        if (truckRutas != null && !truckRutas.isEmpty()) {
+            sb.append("\nRutas:");
+            for (int i = 0; i < data.camiones.size(); i++) {
+                String tid = data.camiones.get(i).getId();
+                ArrayList<Integer> ruta = truckRutas.get(tid);
+                if (ruta == null || ruta.isEmpty()) continue;
+                sb.append("\n  ").append(tid).append(": ");
+                for (int j = 0; j < ruta.size(); j++) {
+                    if (j > 0) sb.append(" → ");
+                    sb.append(data.vertexId.get(ruta.get(j)));
+                }
+            }
         }
         return sb.toString();
     }
@@ -173,6 +193,32 @@ public class LogisTECFrame extends JFrame {
                 }
             }
 
+            // ── Dibujar rutas de camiones ────────────────
+            if (truckRutas != null && !truckRutas.isEmpty()) {
+                int truckIdx = 0;
+                for (int i = 0; i < data.camiones.size(); i++) {
+                    String tid = data.camiones.get(i).getId();
+                    ArrayList<Integer> ruta = truckRutas.get(tid);
+                    if (ruta == null || ruta.size() < 2) continue;
+
+                    g2.setColor(ROUTE_COLORS[truckIdx % ROUTE_COLORS.length]);
+                    g2.setStroke(new BasicStroke(3f));
+
+                    for (int j = 0; j < ruta.size() - 1; j++) {
+                        int from = ruta.get(j);
+                        int to   = ruta.get(j + 1);
+                        int x1 = (int) (data.vertexX[from] * scale) + offsetX;
+                        int y1 = (int) (data.vertexY[from] * scale) + offsetY;
+                        int x2 = (int) (data.vertexX[to]   * scale) + offsetX;
+                        int y2 = (int) (data.vertexY[to]   * scale) + offsetY;
+                        g2.drawLine(x1, y1, x2, y2);
+                    }
+
+                    g2.setStroke(new BasicStroke(1f));
+                    truckIdx++;
+                }
+            }
+
             // ── Dibujar vértices ─────────────────────────
             int r = (int) (VERTEX_RADIUS * scale);
             for (int i = 0; i < data.V; i++) {
@@ -217,6 +263,23 @@ public class LogisTECFrame extends JFrame {
             g2.setColor(Color.BLACK);
             g2.drawOval(lx, ly - 8, 10, 10);
             g2.drawString("Intersección", lx + 14, ly + 2);
+
+            // ── Leyenda de camiones ──────────────────────
+            if (truckRutas != null && !truckRutas.isEmpty()) {
+                int truckIdx = 0;
+                for (int i = 0; i < data.camiones.size(); i++) {
+                    String tid = data.camiones.get(i).getId();
+                    if (!truckRutas.containsKey(tid)) continue;
+                    ly += 18;
+                    g2.setColor(ROUTE_COLORS[truckIdx % ROUTE_COLORS.length]);
+                    g2.setStroke(new BasicStroke(3f));
+                    g2.drawLine(lx, ly - 3, lx + 10, ly - 3);
+                    g2.setStroke(new BasicStroke(1f));
+                    g2.setColor(Color.BLACK);
+                    g2.drawString(tid, lx + 14, ly + 2);
+                    truckIdx++;
+                }
+            }
         }
     }
 }
