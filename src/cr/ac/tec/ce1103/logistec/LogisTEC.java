@@ -2,11 +2,11 @@ package cr.ac.tec.ce1103.logistec;
 
 import cr.ac.tec.ce1103.logistec.algorithms.FloydWarshall;
 import cr.ac.tec.ce1103.logistec.algorithms.Kruskal;
+import cr.ac.tec.ce1103.logistec.algorithms.Prim;
 import cr.ac.tec.ce1103.logistec.algorithms.Warshall;
 import cr.ac.tec.ce1103.logistec.graph.ArrayList;
 import cr.ac.tec.ce1103.logistec.graph.Edge;
 import cr.ac.tec.ce1103.logistec.graph.HashMap;
-import cr.ac.tec.ce1103.logistec.algorithms.Prim;
 import cr.ac.tec.ce1103.logistec.io.GraphLoader;
 import cr.ac.tec.ce1103.logistec.io.GraphLoader.GraphData;
 import cr.ac.tec.ce1103.logistec.model.Package;
@@ -185,19 +185,22 @@ public class LogisTEC {
      */
     private void asignarPaquetes() {
         System.out.println("--- Asignación de paquetes ---");
-        RoutePlanner.asignarBestFit(data.paquetes, data.camiones);
-        int asignados = 0;
-        int rechazados = 0;
+        
+        HashMap<String, String> paqueteACamion = new HashMap<>();
+        RoutePlanner.asignarBestFit(data.paquetes, data.camiones, paqueteACamion);
+        
+        int asignados = 0, rechazados = 0;
         for (int i = 0; i < data.paquetes.size(); i++) {
             Package p = data.paquetes.get(i);
             if (p.isRechazado()) {
                 rechazados++;
+                System.out.println("  Rechazado: " + p);
             } else {
                 asignados++;
+                System.out.println("  " + p.getId() + " → camión " + paqueteACamion.get(p.getId()));
             }
         }
-        System.out.println("Paquetes asignados: " + asignados);
-        System.out.println("Paquetes rechazados: " + rechazados);
+        System.out.println("Asignados: " + asignados + " | Rechazados: " + rechazados);
         System.out.println();
     }
 
@@ -207,94 +210,60 @@ public class LogisTEC {
     private void planificarRutas() {
         System.out.println("--- Planificación de rutas ---");
 
-        // Construir mapeo: destino (string) → lista de paquetes para ese destino
-        // Luego asignar esas paradas al camión que recibió los paquetes
-        HashMap<String, ArrayList<Package>> destinoPaquetes = new HashMap<>();
-        for (int i = 0; i < data.paquetes.size(); i++) {
-            Package p = data.paquetes.get(i);
-            if (p.isRechazado()) continue;
-            if (!destinoPaquetes.containsKey(p.getDestino())) {
-                destinoPaquetes.put(p.getDestino(), new ArrayList<>());
-            }
-            destinoPaquetes.get(p.getDestino()).add(p);
-        }
-
-        // Asignar paradas a los camiones según los paquetes que recibieron
-        // Nota: en best-fit los paquetes se asignan a camiones pero no guardamos
-        // esa relación. Para este prototipo, agrupamos por destino y asignamos
-        // equitativamente entre los camiones con carga.
-        ArrayList<Truck> camionesConCarga = new ArrayList<>();
-        for (int i = 0; i < data.camiones.size(); i++) {
-            if (data.camiones.get(i).getCargaActual() > 0) {
-                camionesConCarga.add(data.camiones.get(i));
-            }
-        }
-
-        if (camionesConCarga.size() == 0) {
-            System.out.println("No hay camiones con carga asignada.");
-            System.out.println();
-            return;
-        }
-
-        // Distribuir los destinos entre los camiones con carga
-        Object[] destinos = destinoPaquetes.keys();
-        int idx = 0;
-        for (int i = 0; i < destinos.length; i++) {
-            String destino = (String) destinos[i];
-            Truck t = camionesConCarga.get(idx % camionesConCarga.size());
-            t.getParadas().add(destino);
-            idx++;
-        }
-
-        // Para cada camión, calcular rutas con NN y MST-based
         for (int i = 0; i < data.camiones.size(); i++) {
             Truck t = data.camiones.get(i);
             if (t.getParadas().isEmpty()) continue;
 
-            System.out.println("Camión " + t.getId() + " (" + t.getCargaActual()
-                + "/" + t.getCapacidad() + " kg, "
+            System.out.println("Camión " + t.getId() + " ("
+                + t.getCargaActual() + "/" + t.getCapacidad() + " kg, "
                 + String.format("%.1f", t.porcentajeOcupacion()) + "% ocupado)");
             System.out.println("  Paradas: " + t.getParadas());
 
             int[] stops = RoutePlanner.obtenerIndicesParadas(t, data.vertexIndex);
-            double mejorDist = Double.POSITIVE_INFINITY;
-            ArrayList<Integer> mejorRuta = null;
-            String metodo = "";
 
             // Nearest Neighbor
-            ArrayList<Integer> rutaNN = RoutePlanner.nearestNeighbor(distMatrix, stops, data.depotIndex);
+            ArrayList<Integer> rutaNN = RoutePlanner.nearestNeighbor(
+                distMatrix, stops, data.depotIndex);
             double distNN = RoutePlanner.calcularDistanciaRuta(rutaNN, distMatrix);
-            System.out.println("  NN: distancia=" + String.format("%.0f", distNN) + " m");
-            mejorDist = distNN;
-            mejorRuta = rutaNN;
-            metodo = "NN";
+            System.out.println("  NN:  " + formatearRuta(rutaNN)
+                + " | dist=" + String.format("%.0f", distNN) + " m");
 
             // MST-based
-            ArrayList<Integer> rutaMST = RoutePlanner.mstBased(distMatrix, stops, data.depotIndex);
+            ArrayList<Integer> rutaMST = RoutePlanner.mstBased(
+                distMatrix, stops, data.depotIndex);
+
+            ArrayList<Integer> mejorRuta = rutaNN;
+            double mejorDist = distNN;
+            String metodo = "NN";
+
             if (rutaMST != null) {
                 double distMST = RoutePlanner.calcularDistanciaRuta(rutaMST, distMatrix);
-                double mejora = ((distNN - distMST) / distNN) * 100.0;
-                System.out.println("  MST: distancia=" + String.format("%.0f", distMST) + " m"
-                    + " (mejora: " + String.format("%.1f", mejora) + "%)");
-
+                double mejora  = ((distNN - distMST) / distNN) * 100.0;
+                System.out.println("  MST: " + formatearRuta(rutaMST)
+                    + " | dist=" + String.format("%.0f", distMST) + " m"
+                    + " | mejora=" + String.format("%.1f", mejora) + "%");
                 if (distMST < mejorDist) {
                     mejorDist = distMST;
                     mejorRuta = rutaMST;
-                    metodo = "MST-based";
+                    metodo    = "MST-based";
                 }
             } else {
                 System.out.println("  MST: pendiente de implementación");
             }
 
-            // Mostrar ruta elegida
-            System.out.print("  Ruta (" + metodo + "): ");
-            for (int j = 0; j < mejorRuta.size(); j++) {
-                if (j > 0) System.out.print(" → ");
-                System.out.print(data.vertexId.get(mejorRuta.get(j)));
-            }
-            System.out.println();
-            System.out.println("  Distancia total: " + String.format("%.0f", mejorDist) + " m\n");
+            System.out.println("  Mejor ruta (" + metodo + "): "
+                + formatearRuta(mejorRuta)
+                + " | " + String.format("%.0f", mejorDist) + " m\n");
         }
+    }
+
+    private String formatearRuta(ArrayList<Integer> ruta) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < ruta.size(); i++) {
+            if (i > 0) sb.append("→");
+            sb.append(data.vertexId.get(ruta.get(i)));
+        }
+        return sb.toString();
     }
 
     /**
