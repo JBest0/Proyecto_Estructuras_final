@@ -38,7 +38,10 @@ public class RoutePlanner {
      * @param paquetes lista de paquetes a asignar
      * @param camiones lista de camiones disponibles
      */
-    public static void asignarBestFit(ArrayList<Package> paquetes, ArrayList<Truck> camiones) {
+    
+    public static void asignarBestFit(ArrayList<Package> paquetes, 
+                                    ArrayList<Truck> camiones,
+                                    HashMap<String, String> paqueteACamion) {
         if (paquetes == null || paquetes.isEmpty()) return;
         if (camiones == null || camiones.isEmpty()) {
             for (int i = 0; i < paquetes.size(); i++) {
@@ -47,10 +50,8 @@ public class RoutePlanner {
             return;
         }
 
-        // Ordenar paquetes: prioridad ascendente, luego peso descendente
         ordenarPaquetes(paquetes);
 
-        // Para cada paquete, buscar el mejor camión
         for (int i = 0; i < paquetes.size(); i++) {
             Package p = paquetes.get(i);
             if (p.isRechazado()) continue;
@@ -68,7 +69,10 @@ public class RoutePlanner {
 
             if (mejor != null) {
                 mejor.agregarCarga(p.getPeso());
-                mejor.getParadas().add(p.getDestino()); //Agregue esta linea porque el camión no guardaba qué paquetes lleva, esto agrega el destino como parada
+                mejor.getParadas().add(p.getDestino()); // parada del destino
+                if (paqueteACamion != null) {
+                    paqueteACamion.put(p.getId(), mejor.getId()); // registrar relación
+                }
             } else {
                 p.marcarRechazado();
             }
