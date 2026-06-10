@@ -170,8 +170,32 @@ public class DFS {
      * @return lista con los vértices en el orden de visita del preorden
      */
     public static ArrayList<Integer> preorder(HashMap<Integer, ArrayList<Integer>> mst, int start) {
-        throw new UnsupportedOperationException(
-            "DFS.preorder: implementar por el equipo");
+        ArrayList<Integer> orden = new ArrayList<>();
+        HashSet<Integer> visitados = new HashSet<>();
+        LinkedList<Integer> pila = new LinkedList<>();
+    
+        pila.add(start); // add() inserta al inicio → tope de la pila
+    
+        while (!pila.isEmpty()) {
+            int nodo = pila.remove(0); // remove(0) saca del inicio → pop
+    
+            if (!visitados.contains(nodo)) {
+                visitados.add(nodo);
+                orden.add(nodo); // preorden: registrar al visitar
+    
+                ArrayList<Integer> vecinos = mst.get(nodo);
+                if (vecinos != null) {
+                    // Insertar en orden inverso para que el primero quede en el tope
+                    for (int i = vecinos.size() - 1; i >= 0; i--) {
+                        int vecino = vecinos.get(i);
+                        if (!visitados.contains(vecino)) {
+                            pila.add(vecino);
+                        }
+                    }
+                }
+            }
+        }
+        return orden;
     }
 
     /**
