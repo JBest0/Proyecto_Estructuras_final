@@ -372,8 +372,21 @@ public class LogisTEC {
 
     private void mostrarUI() {
         try {
+            // Convertir HashMap a listas ordenadas para el frame
+            ArrayList<ArrayList<Integer>> rutasLista = new ArrayList<>();
+            ArrayList<String> nombresLista = new ArrayList<>();
+
+            for (int i = 0; i < data.camiones.size(); i++) {
+                String tid = data.camiones.get(i).getId();
+                if (truckRutas != null && truckRutas.containsKey(tid)) {
+                    rutasLista.add(truckRutas.get(tid));
+                    nombresLista.add(tid);
+                }
+            }
+
             cr.ac.tec.ce1103.logistec.ui.LogisTECFrame frame =
-                new cr.ac.tec.ce1103.logistec.ui.LogisTECFrame(data, truckRutas);
+                new cr.ac.tec.ce1103.logistec.ui.LogisTECFrame(
+                    data, rutasLista, nombresLista);
             frame.setVisible(true);
         } catch (Exception e) {
             System.out.println("[UI] No se pudo iniciar la interfaz grafica: " + e.getMessage());
