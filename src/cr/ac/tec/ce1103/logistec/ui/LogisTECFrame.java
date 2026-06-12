@@ -132,6 +132,26 @@ public class LogisTECFrame extends JFrame {
                 sb.append("\n");
             }
         }
+        
+        // Paquetes rechazados
+        ArrayList<String> rechazadosList = new ArrayList<>();
+        for (int i = 0; i < data.paquetes.size(); i++) {
+            cr.ac.tec.ce1103.logistec.model.Package p = data.paquetes.get(i);
+            if (p.isRechazado()) {
+                rechazadosList.add(p.getId() + " → " + p.getDestino()
+                    + " (" + p.getPeso() + "kg, prio=" + p.getPrioridad() + ")");
+            }
+        }
+
+        if (!rechazadosList.isEmpty()) {
+            sb.append("Rechazados: ");
+            for (int i = 0; i < rechazadosList.size(); i++) {
+                if (i > 0) sb.append(" | ");
+                sb.append(rechazadosList.get(i));
+            }
+            sb.append("\n");
+        }
+        
         return sb.toString();
     }
 
